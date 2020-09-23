@@ -75,6 +75,6 @@ async def audit(ctx):
 async def save_audit_logs(guild):
     with open(f'audit_logs_{guild.name}', 'w+') as f:
         async for entry in guild.audit_logs(limit=100):
-            f.write('{0.user} did {0.action} to {0.target}'.format(entry))
+            f.write('{0.user} did {0.action} to {0.target}\n'.format(entry))
 
 bot.run(TOKEN)
