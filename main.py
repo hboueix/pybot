@@ -2,13 +2,14 @@ import os
 import random
 import datetime
 
+from lib.config import Config
+
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
 
-load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
-PREFIX = os.getenv('COMMANDS_PREFIX')
+config = Config()
+TOKEN = config.token
+PREFIX = config.prefix
 
 bot = commands.Bot(command_prefix=PREFIX)
 
@@ -168,7 +169,6 @@ async def setActivity(action, onwhat, url):
         return False
     else:
         ACTIVITY = activity
-        print(STATUS)
         await bot.change_presence(status=STATUS, activity=activity)
         return True
 
@@ -189,7 +189,6 @@ async def setStatus(state):
         return False
     else:
         STATUS = status
-        print(ACTIVITY)
         await bot.change_presence(status=status, activity=ACTIVITY)
         return True
 
