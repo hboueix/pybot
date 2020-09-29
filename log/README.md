@@ -1,0 +1,1 @@
+# Just to keep log directory while versioning
