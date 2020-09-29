@@ -6,7 +6,7 @@ from lib.config import Config
 import discord
 from discord.ext import commands
 
-VERSION = '1.0.0'
+VERSION = '1.1.0'
 INIT_TIME = datetime.datetime.now()
 
 
