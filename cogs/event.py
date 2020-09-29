@@ -1,3 +1,5 @@
+import datetime
+
 import discord
 from discord.ext import commands
 
@@ -35,7 +37,8 @@ class Event(commands.Cog):
         if message.author == self.bot.user:
             return
 
-        print(f'{message.author.name} : {message.content}')
+        now = datetime.datetime.now().strftime("%H:%M:%S")
+        print(f'[{now}] {message.author.name} : {message.content}')
 
         fast_answer = {
             'mdr': 'x)',
@@ -44,8 +47,9 @@ class Event(commands.Cog):
 
         if message.content[0] != self.bot.command_prefix:
             for key, value in fast_answer.items():
-                if key in message.content.lower() and winOrFail(0.5):
+                if key in message.content.lower() and winOrFail(0.3):
                     await message.channel.send(value)
+                    await save_msg_logs(self.bot, message)
                     break
 
         trashtalk_quotes = [

@@ -1,30 +1,46 @@
 import datetime
 import random
 
+from lib.config import Config
+
+import discord
+from discord.ext import commands
+
 VERSION = '1.0.0'
-CONFIG = './config.txt'
 INIT_TIME = datetime.datetime.now()
 
 
-def getFromConfigFile(var):
-    with open(CONFIG) as f:
-        lines = f.read().splitlines()
+def userIsOwner():
+    def predicate(ctx):
+        print(ctx)
+        return True if ctx.message.author.id == getOwnerId() else False
+    return commands.check(predicate)
 
-    for line in lines:
-        if line.startswith(var):
-            return line.split('=')[1]
+
+def getOwnerId():
+    return int(Config().owner_id)
+
+
+async def alertWrongPerms(ctx):
+    await ctx.channel.send('Vous n\'avez pas accès à cette commande !')
 
 
 def save_commands_logs(bot, ctx):
     now = datetime.datetime.now().strftime("%H:%M:%S")
-    with open(f'commands_logs_{bot.user.name}', 'a') as f:
-        f.write(f"{now} {ctx.message.author} exec: {ctx.message.content}\n")
+    with open(f'log/commands_{bot.user.name}.log', 'a') as f:
+        f.write(f"[{now}] {ctx.message.author} exec: {ctx.message.content}\n")
 
 
-def save_msg_logs(bot, ctx):
+def save_commands_refused_logs(bot, ctx):
     now = datetime.datetime.now().strftime("%H:%M:%S")
-    with open(f'msg_logs_{bot.user.name}', 'a') as f:
-        f.write(f"{now} reply to: {ctx.message.content}\n")
+    with open(f'log/commands_refused_{bot.user.name}.log', 'a') as f:
+        f.write(f"[{now}] {ctx.message.author} tried to exec: {ctx.message.content}\n")
+
+
+def save_msg_logs(bot, msg):
+    now = datetime.datetime.now().strftime("%H:%M:%S")
+    with open(f'log/msg_{bot.user.name}.log', 'a') as f:
+        f.write(f"[{now}] reply: {msg.content} | to: {msg.author}\n")
 
 
 def winOrFail(delimiter):

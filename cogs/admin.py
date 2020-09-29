@@ -11,6 +11,15 @@ class Admin(commands.Cog):
 		self.status = None
 		self.activity = None
 
+	async def cog_check(self, ctx):
+		if ctx.message.author.id == getOwnerId():
+			check = True
+		else:
+			await alertWrongPerms(ctx)
+			await save_commands_refused_logs(self, ctx)
+			check = False
+		return check
+
 	async def setStatus(self, state):
 		all_status = {
 			'idle': discord.Status.idle,
@@ -101,7 +110,7 @@ class Admin(commands.Cog):
 		await ctx.message.delete()
 		await ctx.channel.send('Sauvegarde des logs du serveur...')
 		guild = ctx.channel.guild
-		with open(f'audit_logs_{guild.name}', 'w+') as f:
+		with open(f'log/audit_{guild.name}.log', 'w+') as f:
 			async for entry in guild.audit_logs(limit=100):
 				f.write(
 					f'{entry.user} did {entry.action} to {entry.target}\n'

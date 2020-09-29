@@ -5,9 +5,11 @@ class Config():
 
     def __init__(self):
         self.token = self.getFromConfigFile('DISCORD_TOKEN')
+        self.guild = self.getFromConfigFile('DISCORD_GUILD')
         self.prefix = self.getFromConfigFile('COMMANDS_PREFIX')
-        # self.guild
+        self.owner_id = self.getFromConfigFile('OWNER_ID')
 
+    
     def getFromConfigFile(self, var):
         with open(filename) as f:
             lines = f.read().splitlines()
