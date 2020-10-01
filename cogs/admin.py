@@ -42,7 +42,8 @@ class Admin(commands.Cog):
 			'play': discord.Game(name=onwhat, type=3),
 			'stream': discord.Streaming(name=onwhat, url=url),
 			'listen': discord.Activity(type=discord.ActivityType.listening, name=onwhat),
-			'watch': discord.Activity(type=discord.ActivityType.watching, name=onwhat)
+			'watch': discord.Activity(type=discord.ActivityType.watching, name=onwhat),
+			'none': None
 		}
 		activity = all_activities.get(action, 'NOT FOUND')
 
