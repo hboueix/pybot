@@ -6,15 +6,15 @@ from lib.config import Config
 import discord
 from discord.ext import commands
 
-VERSION = '1.1.0'
+VERSION = '1.2.0'
 INIT_TIME = datetime.datetime.now()
 
 
-def userIsOwner():
-    def predicate(ctx):
-        print(ctx)
-        return True if ctx.message.author.id == getOwnerId() else False
-    return commands.check(predicate)
+def getChannel(bot, channel_name):
+    for guild in bot.guilds:
+        for channel in guild.channels:
+            if channel.name == channel_name:
+                return channel
 
 
 def getOwnerId():
