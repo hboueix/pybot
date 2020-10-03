@@ -1,11 +1,10 @@
 import datetime
 import asyncio
+import feedparser
+import random
 
 import discord
 from discord.ext import commands
-
-from lib.utils import *
-from lib.rss import getLastEntry
 
 
 class Event(commands.Cog):
@@ -14,23 +13,7 @@ class Event(commands.Cog):
         self.bot = bot
         self.bg_task = self.bot.loop.create_task(self.background_task())
 
-    async def background_task(self):
-        await self.bot.wait_until_ready()
-
-        last_entry = getLastEntry()
-        channel = getChannel(self.bot, 'bot-room')
-
-        while not self.bot.is_closed():
-            now = datetime.datetime.now()
-
-            if now.weekday() in (2, 3):
-                update = getLastEntry()
-                if update.title != last_entry.title:
-                    last_entry = update
-                    await channel.send("@here", embed=last_entry)
-      
-            await asyncio.sleep(1800)
-
+    # region listeners
     @commands.Cog.listener()
     async def on_ready(self):
         print(
@@ -67,9 +50,9 @@ class Event(commands.Cog):
 
         if len(message.content) > 0 and message.content[0] != self.bot.command_prefix:
             for key, value in fast_answer.items():
-                if key in message.content.lower() and winOrFail(0.3):
+                if key in message.content.lower() and self.winOrFail(0.3):
                     await message.channel.send(value)
-                    await save_msg_logs(self.bot, message)
+                    await self.save_msg_logs(self.bot, message)
                     break
 
         trashtalk_quotes = [
@@ -82,6 +65,62 @@ class Event(commands.Cog):
             ),
         ]
 
-        if message.author.bot and message.author.name == 'daftbot' and winOrFail(0.3):
-            response = f'{message.author.mention} ' + random.choice(trashtalk_quotes)
+        if message.author.bot and message.author.name == 'daftbot' and self.winOrFail(0.3):
+            response = f'{message.author.mention} ' + \
+                random.choice(trashtalk_quotes)
             await message.channel.send(response)
+    # endregion
+
+    # region methods
+    async def background_task(self):
+        await self.bot.wait_until_ready()
+
+        last_entry = self.getLastEntry()
+        channel = self.getChannel(self.bot, 'bot-room')
+
+        while not self.bot.is_closed():
+            now = datetime.datetime.now()
+
+            if now.weekday() in (2, 3):
+                update = self.getLastEntry()
+                if update.title != last_entry.title:  # and checkVF(update):
+                    last_entry = update
+                    await channel.send("@here", embed=last_entry)
+
+            await asyncio.sleep(1800)
+
+    def getLastEntry(self):
+        feed_url = "https://www.japscan.se/rss/solo-leveling/"
+        img_url = "https://www.japscan.se/imgs/mangas/solo-leveling.jpg"
+        anime_feed = feedparser.parse(feed_url)
+
+        entries = anime_feed.entries
+        entry = entries[0]
+
+        embed = discord.Embed(
+            title=entry.title, url=entry.link, color=0x2b14f3)
+        embed.set_thumbnail(url=img_url)
+        embed.add_field(name="Go le lire", value=entry.link, inline=False)
+
+        # for key in anime_feed.keys():
+        # 	if key != 'entries':
+        # 		print(f'{key} : {anime_feed[key]}')
+        # for key in entry.keys():
+        # 	print(f'{key} : {entry[key]}')
+
+        return embed
+
+    def winOrFail(self, delimiter):
+        return True if random.random() < float(delimiter) else False
+
+    def getChannel(self, bot, channel_name):
+        for guild in bot.guilds:
+            for channel in guild.channels:
+                if channel.name == channel_name:
+                    return channel
+
+    def save_msg_logs(self, bot, msg):
+        now = datetime.datetime.now().strftime("%H:%M:%S")
+        with open(f'log/msg_{bot.user.name}.log', 'a') as f:
+            f.write(f"[{now}] reply: {msg.content} | to: {msg.author}\n")
+    # endregion

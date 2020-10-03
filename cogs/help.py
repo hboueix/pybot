@@ -1,17 +1,16 @@
-from lib.config import Config
-from lib.utils import *
+import datetime
 
 import discord
 from discord.ext import commands
-
-PREFIX = Config().prefix
 
 
 class Help(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.prefix = self.bot.command_prefix
 
+    # region commands
     @commands.command(name='help', help='Get help with a command or cog.\n eg. `!help utils`')
     async def help(self, ctx, page='Help'):
         page = page.capitalize()
@@ -23,15 +22,15 @@ class Help(commands.Cog):
             embed = discord.Embed(title=f'Help with {page} cog',
                                   description=self.bot.cogs[page].__doc__, color=color)
 
-            embed.add_field(name=f'The current loaded cogs are (`{all_cogs}`) :gear:', value=f'**Cog commands**: '
+            embed.add_field(name=f'The current loaded command categories are (`{all_cogs}`) :gear:', value=f'**Cog commands**: '
                             f'{self.bot.description}')
 
             for c in self.bot.get_cog(page).get_commands():
                 if await c.can_run(ctx):
                     if len(c.signature) == 0:
-                        command = f'`{PREFIX}{c.name}`'
+                        command = f'`{self.prefix}{c.name}`'
                     else:
-                        command = f'`{PREFIX}{c.name} {c.signature}`'
+                        command = f'`{self.prefix}{c.name} {c.signature}`'
                     if len(c.short_doc) == 0:
                         message = 'There is no documentation for this command'
                     else:
@@ -41,7 +40,7 @@ class Help(commands.Cog):
             all_commands = [c.name for c in self.bot.commands if await c.can_run(ctx)]
             page_lo = page.lower()
             if page_lo in all_commands:
-                embed = discord.Embed(title=f'Help with the `{PREFIX}'
+                embed = discord.Embed(title=f'Help with the `{self.prefix}'
                                       f'{self.bot.get_command(page_lo)}` command', color=color)
                 if len(self.bot.get_command(page_lo).help) == 0:
                     message = 'There is no documentation for this command'
@@ -60,3 +59,12 @@ class Help(commands.Cog):
                     name=f'Current loaded Cogs are (`{all_cogs}`) :gear:', value='\u200b')
 
         await ctx.send(embed=embed)
+    # endregion
+
+    # region methods
+    def save_commands_logs(self, bot, ctx):
+        now = datetime.datetime.now().strftime("%H:%M:%S")
+        with open(f'log/commands_{bot.user.name}.log', 'a') as f:
+            f.write(
+                f"[{now}] {ctx.message.author} exec: {ctx.message.content}\n")
+    # endregion
