@@ -57,6 +57,7 @@ class Utils(commands.Cog):
         cmd = 'git describe --tags'.split()
         try:
             version = subprocess.check_output(cmd).decode().strip()
+            version = version.split('-')[0]
             response = f'{self.bot.user.name} {version}'
         except subprocess.CalledProcessError:
             response = 'Unable to get version number from git tags.'
