@@ -1,9 +1,9 @@
 # PyBot
 
-[![PyPI](https://img.shields.io/badge/discord-1.5.0-red?style=plastic)](https://pypi.python.org/pypi/discord.py/)
-[![PyPI](https://img.shields.io/badge/feedparser-6.0.1-yellow?style=plastic)](https://pypi.python.org/https://pypi.org/project/feedparser/)
-[![PyPI](https://img.shields.io/pypi/pyversions/discord.py.svg?style=plastic&logo=Python)](https://www.python.org/downloads/)
-[![PyPI](https://img.shields.io/github/repo-size/hboueix/pybot?color=yellow?style=plastic&logo=Github)](https://pypi.python.org/pypi/discord.py/)
+[![PyPI](https://img.shields.io/badge/discord-1.5.0-red)](https://pypi.python.org/pypi/discord.py/)
+[![PyPI](https://img.shields.io/badge/feedparser-6.0.1-yellow)](https://pypi.python.org/https://pypi.org/project/feedparser/)
+[![PyPI](https://img.shields.io/pypi/pyversions/discord.py.svg?logo=Python)](https://www.python.org/downloads/)
+[![PyPI](https://img.shields.io/github/repo-size/hboueix/pybot?color=yellow?logo=Github)](https://pypi.python.org/pypi/discord.py/)
 
 ## Pré-requis
 
