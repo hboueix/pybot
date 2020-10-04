@@ -1,16 +1,12 @@
-import os
+import logging
+from discord.ext import commands
 
 from config import Config
-
-import discord
-from discord.ext import commands
 
 from cogs.event import Event
 from cogs.admin import Admin
 from cogs.utils import Utils
 from cogs.help import Help
-
-import logging
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)

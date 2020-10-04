@@ -1,7 +1,7 @@
 import datetime
 import asyncio
-import feedparser
 import random
+import feedparser
 
 import discord
 from discord.ext import commands
@@ -50,7 +50,7 @@ class Event(commands.Cog):
 
         if len(message.content) > 0 and message.content[0] != self.bot.command_prefix:
             for key, value in fast_answer.items():
-                if key in message.content.lower() and self.winOrFail(0.3):
+                if key in message.content.lower() and self.win_or_fail(0.3):
                     await message.channel.send(value)
                     await self.save_msg_logs(self.bot, message)
                     break
@@ -65,7 +65,7 @@ class Event(commands.Cog):
             ),
         ]
 
-        if message.author.bot and message.author.name == 'daftbot' and self.winOrFail(0.3):
+        if message.author.bot and message.author.name == 'daftbot' and self.win_or_fail(0.3):
             response = f'{message.author.mention} ' + \
                 random.choice(trashtalk_quotes)
             await message.channel.send(response)
@@ -75,21 +75,21 @@ class Event(commands.Cog):
     async def background_task(self):
         await self.bot.wait_until_ready()
 
-        last_entry = self.getLastEntry()
-        channel = self.getChannel(self.bot, 'bot-room')
+        last_entry = self.get_last_entry()
+        channel = self.get_channel(self.bot, 'bot-room')
 
         while not self.bot.is_closed():
             now = datetime.datetime.now()
 
             if now.weekday() in (2, 3):
-                update = self.getLastEntry()
+                update = self.get_last_entry()
                 if update.title != last_entry.title:  # and checkVF(update):
                     last_entry = update
                     await channel.send("@here", embed=last_entry)
 
             await asyncio.sleep(1800)
 
-    def getLastEntry(self):
+    def get_last_entry(self):
         feed_url = "https://www.japscan.se/rss/solo-leveling/"
         img_url = "https://www.japscan.se/imgs/mangas/solo-leveling.jpg"
         anime_feed = feedparser.parse(feed_url)
@@ -110,10 +110,10 @@ class Event(commands.Cog):
 
         return embed
 
-    def winOrFail(self, delimiter):
+    def win_or_fail(self, delimiter):
         return True if random.random() < float(delimiter) else False
 
-    def getChannel(self, bot, channel_name):
+    def get_channel(self, bot, channel_name):
         for guild in bot.guilds:
             for channel in guild.channels:
                 if channel.name == channel_name:
@@ -121,6 +121,7 @@ class Event(commands.Cog):
 
     def save_msg_logs(self, bot, msg):
         now = datetime.datetime.now().strftime("%H:%M:%S")
-        with open(f'log/msg_{bot.user.name}.log', 'a') as f:
-            f.write(f"[{now}] reply: {msg.content} | to: {msg.author}\n")
+        with open(f'log/msg_{bot.user.name}.log', 'a') as log_file:
+            log_file.write(
+                f"[{now}] reply: {msg.content} | to: {msg.author}\n")
     # endregion

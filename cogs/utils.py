@@ -46,9 +46,10 @@ class Utils(commands.Cog):
             12: 'Décembre'
         }
         await ctx.channel.send(
-            f'Je tourne depuis le {start.day} {months[start.month]} {start.year} ({start.hour}h{start.minute}).\n'
-            f'Soit depuis {uptime.days} jour(s), {uptime.seconds//3600} heure(s), {(uptime.seconds%3600)//60} minute(s) et {(uptime.seconds%3600)%60} seconde(s).'
-        )
+            f'Je tourne depuis le {start.day} {months[start.month]} {start.year} '
+            f'({start.hour}h{start.minute}).\n'
+            f'Soit depuis {uptime.days} jour(s), {uptime.seconds//3600} heure(s), '
+            f'{(uptime.seconds%3600)//60} minute(s) et {(uptime.seconds%3600)%60} seconde(s).')
         self.save_commands_logs(self.bot, ctx)
 
     @commands.command(name='version', help='Display bot version.')
@@ -67,13 +68,13 @@ class Utils(commands.Cog):
 
     @commands.command(name='userinfo', help='Give infos about user.')
     async def userinfo(self, ctx, user=None):
-        if user == None:
+        if user is None:
             member = ctx.message.author
         else:
             user = str(user)
             member = ctx.message.guild.get_member_named(user)
 
-        if member == None:
+        if member is None:
             await ctx.message.delete()
             await ctx.channel.send(f"{ctx.message.author.mention} L'utilisateur {user} est inconnu")
         else:
@@ -81,14 +82,15 @@ class Utils(commands.Cog):
             tmp = await ctx.channel.send("Chargement des informations...")
 
             try:
-                roles_list = self.getListUserRoles(member)
-                createdAt = self.dateConverter(member.created_at)
-                joinedAt = self.dateConverter(member.joined_at)
+                title = f"Userinfo for {member.name}#{member.discriminator} [{member.top_role}]:"
+                roles_list = self.get_list_user_roles(member)
+                created_at = self.date_converter(member.created_at)
+                joined_at = self.date_converter(member.joined_at)
                 status = str(member.status)
                 status_final = status.capitalize() if status != 'dnd' else 'Do not disturb'
 
                 user_embed = discord.Embed()
-                user_embed.title = f"Userinfo for {member.name}#{member.discriminator} [{member.top_role}]:"
+                user_embed.title = title
                 user_embed.colour = 0x3498db
                 user_embed.set_thumbnail(url=member.avatar_url)
                 user_embed.add_field(name="Nickname", value=member.nick)
@@ -99,17 +101,19 @@ class Utils(commands.Cog):
                 if hasattr(member, 'game'):
                     user_embed.add_field(name='Playing', value=member.game)
                 user_embed.add_field(
-                    name='Account created on', value=createdAt)
-                user_embed.add_field(name='Join server on', value=joinedAt)
+                    name='Account created on', value=created_at)
+                user_embed.add_field(name='Join server on', value=joined_at)
                 user_embed.add_field(name="Roles", value=', '.join(roles_list))
                 user_embed.set_footer(
-                    text=f"Requested by {ctx.message.author.name}", icon_url=ctx.message.author.avatar_url)
+                    text=f"Requested by {ctx.message.author.name}",
+                    icon_url=ctx.message.author.avatar_url)
 
                 await tmp.delete()
                 await ctx.channel.send(embed=user_embed)
 
-            except Exception as e:
-                await ctx.channel.send(f'An error occurred while processing this request: ```py\n{type(e).__name__}: {e}\n```')
+            except Exception as error:
+                await ctx.channel.send(f'An error occurred while processing this request: ```py\n'
+                                       f'{type(error).__name__}: {error}\n```')
 
     @commands.command(name='serverinfo', help='Give info about current server.')
     async def serverinfo(self, ctx):
@@ -126,9 +130,9 @@ class Utils(commands.Cog):
         server_embed.add_field(name="Owner's Name", value=guild.owner.name)
         server_embed.add_field(name="Owner's ID", value=guild.owner.id)
         server_embed.add_field(name="Text Channels",
-                               value=str(len(self.getListChannels(guild, 'text'))))
+                               value=str(len(self.get_list_channels(guild, 'text'))))
         server_embed.add_field(name="Voice Channels",
-                               value=str(len(self.getListChannels(guild, 'voice'))))
+                               value=str(len(self.get_list_channels(guild, 'voice'))))
         server_embed.add_field(name="Users", value=guild.member_count)
         server_embed.add_field(name="Verification level",
                                value=verify_level.upper())
@@ -137,7 +141,7 @@ class Utils(commands.Cog):
         # server_embed.add_field(name="Region",
         # 					   value=formatServerRegion(guild.region))
         server_embed.add_field(name="Creation Date",
-                               value=self.dateConverter(guild.created_at))
+                               value=self.date_converter(guild.created_at))
         server_embed.add_field(name="Emotes Count",
                                value=str(len(guild.emojis)))
         # server_embed.add_field(name="Roles",
@@ -152,17 +156,17 @@ class Utils(commands.Cog):
     # endregion
 
     # region methods
-    def dateConverter(self, date):
+    def date_converter(self, date):
         return date.strftime("%a %d %b %Y at %H:%M:%S")
 
-    def getListUserRoles(self, user):
+    def get_list_user_roles(self, user):
         roles = user.roles
         list_roles = []
-        for i in range(len(roles)):
-            list_roles.append(roles[i].name)
+        for role in roles.values():
+            list_roles.append(role.name)
         return list_roles
 
-    def getListChannels(self, guild, chan_type):
+    def get_list_channels(self, guild, chan_type):
         channels = guild.channels
         list_channels = []
         for channel in channels:
@@ -172,7 +176,7 @@ class Utils(commands.Cog):
 
     def save_commands_logs(self, bot, ctx):
         now = datetime.datetime.now().strftime("%H:%M:%S")
-        with open(f'log/commands_{bot.user.name}.log', 'a') as f:
-            f.write(
+        with open(f'log/commands_{bot.user.name}.log', 'a') as log_file:
+            log_file.write(
                 f"[{now}] {ctx.message.author} exec: {ctx.message.content}\n")
     # endregion
