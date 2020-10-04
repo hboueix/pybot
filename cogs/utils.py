@@ -5,13 +5,12 @@ import subprocess
 import discord
 from discord.ext import commands
 
-INIT_TIME = datetime.datetime.now()
-
 
 class Utils(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.init_time = datetime.datetime.now()
 
     # region commands
     @commands.command(name='choose', help='Random choice one between all inputs.')
@@ -29,7 +28,7 @@ class Utils(commands.Cog):
     @commands.command(name='uptime', help='Get bot uptime.')
     async def uptime(self, ctx):
         await ctx.message.delete()
-        start = INIT_TIME
+        start = self.init_time
         uptime = datetime.datetime.now() - start
         months = {
             1: 'Janvier',
