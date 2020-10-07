@@ -76,7 +76,7 @@ class Event(commands.Cog):
         await self.bot.wait_until_ready()
 
         last_entry = self.get_last_entry()
-        channel = self.get_channel(self.bot, 'bot-room')
+        channel = self.get_channel(self.bot, 'news-anime')
 
         while not self.bot.is_closed():
             now = datetime.datetime.now()
