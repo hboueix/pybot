@@ -17,8 +17,6 @@ class Admin(commands.Cog):
         if ctx.message.author.id == self.get_owner_id():
             check = True
         else:
-            await self.alert_wrong_perm(ctx)
-            await self.save_commands_refused_logs(self.bot, ctx)
             check = False
         return check
 
@@ -105,9 +103,6 @@ class Admin(commands.Cog):
             self.activity = activity
             await self.bot.change_presence(status=self.status, activity=self.activity)
             return True
-
-    async def alert_wrong_perm(self, ctx):
-        await ctx.channel.send('Vous n\'avez pas accès à cette commande !')
 
     def get_owner_id(self):
         return int(Config["OWNER_ID"])
