@@ -1,6 +1,8 @@
 import datetime
 import asyncio
 import random
+from urllib.request import urlopen, Request
+from bs4 import BeautifulSoup
 import feedparser
 
 import discord
@@ -82,12 +84,34 @@ class Event(commands.Cog):
             now = datetime.datetime.now()
 
             if now.weekday() in (2, 3):
+                is_last_entry_vf = await self.check_VF(last_entry.url)
                 update = self.get_last_entry()
-                if update.title != last_entry.title:  # and checkVF(update):
+                is_update_vf = await self.check_VF(update.url)
+                if (update.title != last_entry.title and is_update_vf) or \
+                   (is_update_vf and not is_last_entry_vf):
                     last_entry = update
                     await channel.send("@here", embed=last_entry)
 
             await asyncio.sleep(1800)
+
+    async def check_VF(self, link):
+        headers = { 
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:81.0) \
+                            Gecko/20100101 Firefox/81.0',
+        }
+        page = urlopen(Request(link, headers=headers))
+        html_bytes = page.read()
+        html = html_bytes.decode("utf-8")
+
+        soup = BeautifulSoup(html, "html.parser")
+        note = soup.find_all("div", id="note")
+
+        if len(note) > 0:
+            if 'RAW' in note[0]:
+                return False
+
+        return True
 
     def get_last_entry(self):
         feed_url = "https://www.japscan.se/rss/solo-leveling/"
@@ -99,8 +123,8 @@ class Event(commands.Cog):
 
         embed = discord.Embed(
             title=entry.title, url=entry.link, color=0x2b14f3)
-        embed.set_thumbnail(url=img_url)
         embed.add_field(name="Go le lire", value=entry.link, inline=False)
+        embed.set_thumbnail(url=img_url)
 
         # for key in anime_feed.keys():
         # 	if key != 'entries':
