@@ -67,6 +67,7 @@ class Admin(commands.Cog):
                 log_file.write(
                     f'{entry.user} did {entry.action} to {entry.target}\n')
         self.save_commands_logs(self.bot, ctx)
+        await ctx.send("Sauvegarde terminée !")
     # endregion
 
     # region methods

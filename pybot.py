@@ -1,4 +1,5 @@
 import logging
+from discord import Intents
 from discord.ext import commands
 
 from config import Config
@@ -17,7 +18,9 @@ handler.setFormatter(logging.Formatter(
     '%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot = commands.Bot(command_prefix=Config['COMMANDS_PREFIX'])
+intents = Intents.default()
+intents.members, intents.presences = True, True  # Subscribe to the privileged members intent.S
+bot = commands.Bot(command_prefix=Config['COMMANDS_PREFIX'], intents=intents)
 bot.remove_command('help')
 
 bot.add_cog(Event(bot))

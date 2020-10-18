@@ -26,7 +26,7 @@ class Utils(commands.Cog):
         self.save_commands_logs(self.bot, ctx)
 
     @commands.command(name='vote', help='Create a poll about what you give in arguments.')
-    async def vote(self, ctx, question):
+    async def vote(self, ctx, question, time_to_vote: int = 3):
         await ctx.message.delete()
 
         good_emojis = ['\u2705', '\u26D4']
@@ -36,13 +36,13 @@ class Utils(commands.Cog):
         )
         embed.set_thumbnail(url=member.avatar_url)
         embed.add_field(name='Réponses possibles :', value='\u2705 Oui \u26D4 Non')
-        embed.set_footer(text='\u231B 3min')
+        embed.set_footer(text=f'\u231B {time_to_vote}min')
         msg = await ctx.send(embed=embed)
 
         await msg.add_reaction(emoji='\u2705')# :white_check_mark:
         await msg.add_reaction(emoji='\u26D4')# :no_entry:
 
-        await asyncio.sleep(5)
+        await asyncio.sleep(time_to_vote * 60)
 
         msg = await ctx.fetch_message(msg.id)
         reactions_count = {reaction.emoji: reaction.count for reaction in msg.reactions}
@@ -55,11 +55,11 @@ class Utils(commands.Cog):
             else:
                 result += f"{emoji} {react_count - 1}\n"
 
-        winner = max(reactions_count, key=reactions_count.get)
-        max_count = reactions_count.pop(winner)
+        # winner = max(reactions_count, key=reactions_count.get)
+        # max_count = reactions_count.pop(winner)
 
-        if max(reactions_count.values()) == max_count:
-            winner = None
+        # if max(reactions_count.values()) == max_count:
+        #     winner = None
 
         embed = discord.Embed(
             title="Résultat du vote", color=discord.Colour.gold()
@@ -68,7 +68,6 @@ class Utils(commands.Cog):
         embed.add_field(name='Réponses :', value=result)
         embed.set_footer(text=f'a demandé "{question}"', icon_url=member.avatar_url)
 
-        print(winner)
         await ctx.send(embed=embed)
     # endregion
 
