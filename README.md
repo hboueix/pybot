@@ -1,8 +1,11 @@
 # PyBot
 
-[![PyPI](https://img.shields.io/badge/discord-1.5.0-red)](https://pypi.python.org/pypi/discord.py/)
-[![PyPI](https://img.shields.io/badge/feedparser-6.0.1-yellow)](https://pypi.python.org/https://pypi.org/project/feedparser/)
-[![PyPI](https://img.shields.io/pypi/pyversions/discord.py.svg?logo=Python)](https://www.python.org/downloads/)
+[![PyPI](https://img.shields.io/badge/discord-1.5.0-yellow)](https://pypi.org/project/discord.py/)
+[![PyPI](https://img.shields.io/badge/feedparser-6.0.1-yellow)](https://pypi.org/project/feedparser/)
+[![PyPI](https://img.shields.io/badge/beautifulsoup4-4.9.3-yellow)](https://pypi.org/project/beautifulsoup4/)
+[![PyPI](https://img.shields.io/badge/requests-2.24.0-yellow)](https://pypi.org/project/requests/)
+[![PyPI](https://img.shields.io/badge/requests_async-0.6.2-yellow)](https://pypi.org/project/requests-async/)
+[![PyPI](https://img.shields.io/pypi/pyversions/ciphit.svg?logo=Python)](https://www.python.org/downloads/)
 [![PyPI](https://img.shields.io/github/repo-size/hboueix/pybot?color=lightgrey&logo=Github)](https://pypi.python.org/pypi/discord.py/)
 
 ## Pré-requis
