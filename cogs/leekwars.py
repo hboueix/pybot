@@ -8,13 +8,13 @@ import discord
 from discord.ext import commands
 
 
-class LeekWars(commands.Cog):
+class Leekwars(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
         self.connected_users = dict()
 
-    @commands.command(name='login', help='Login to LeekWars API')
+    @commands.command(name='login', help='Login to LeekWars API.')
     async def connect(self, ctx):
         await ctx.message.delete()
         member = ctx.author

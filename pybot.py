@@ -8,7 +8,7 @@ from cogs.event import Event
 from cogs.admin import Admin
 from cogs.utils import Utils
 from cogs.info import Info
-from cogs.leekwars import LeekWars
+from cogs.leekwars import Leekwars
 from cogs.help import Help
 
 logger = logging.getLogger('discord')
@@ -28,7 +28,7 @@ bot.add_cog(Event(bot))
 bot.add_cog(Admin(bot))
 bot.add_cog(Utils(bot))
 bot.add_cog(Info(bot))
-bot.add_cog(LeekWars(bot))
+bot.add_cog(Leekwars(bot))
 bot.add_cog(Help(bot))
 
 bot.run(Config['DISCORD_TOKEN'])
