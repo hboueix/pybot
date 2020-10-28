@@ -78,21 +78,26 @@ class Event(commands.Cog):
         await self.bot.wait_until_ready()
 
         last_entry = self.get_last_entry()
+        is_last_entry_vf = await self.check_VF(last_entry.url)
         channel = self.get_channel(self.bot, 'news-anime')
 
         while not self.bot.is_closed():
             now = datetime.datetime.now()
 
             if now.weekday() in (2, 3):
-                is_last_entry_vf = await self.check_VF(last_entry.url)
                 update = self.get_last_entry()
                 is_update_vf = await self.check_VF(update.url)
-                if (update.title != last_entry.title and is_update_vf) or \
-                   (is_update_vf and not is_last_entry_vf):
+                if is_update_vf and not is_last_entry_vf:
                     last_entry = update
+                    is_last_entry_vf = is_update_vf
                     await channel.send("@here", embed=last_entry)
+                elif update.title != last_entry.title:
+                    last_entry = update
+                    is_last_entry_vf = is_update_vf
+                    if is_update_vf:
+                        await channel.send("@here", embed=last_entry)
 
-            await asyncio.sleep(1800)
+            await asyncio.sleep(10)
 
     async def check_VF(self, link):
         headers = { 
