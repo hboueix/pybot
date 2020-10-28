@@ -14,6 +14,7 @@ class Leekwars(commands.Cog):
         self.bot = bot
         self.connected_users = dict()
 
+    # region commands
     @commands.command(name='login', help='Login to LeekWars API.')
     async def connect(self, ctx):
         await ctx.message.delete()
@@ -23,17 +24,25 @@ class Leekwars(commands.Cog):
         all_dm.append(await member.dm_channel.send(
             "Quel est votre login LeekWars ?")
         )
-        login = await self.bot.wait_for('message',
-                                        check=lambda message: check_dm_channel(
-                                            message, member),
-                                        timeout=120)
+        try:
+            login = await self.bot.wait_for('message',
+                                            check=lambda message: check_dm_channel(
+                                                message, member),
+                                            timeout=180)
+        except asyncio.exceptions.TimeoutError:
+            await ctx.send("Bon ça fait 3 minutes que j'attends...\nJe laisse tomber")
+            return
         all_dm.append(await member.dm_channel.send(
             "Quel est votre mot de passe ?")
         )
-        password = await self.bot.wait_for('message',
-                                           check=lambda message: check_dm_channel(
-                                               message, member),
-                                           timeout=120)
+        try:
+            password = await self.bot.wait_for('message',
+                                            check=lambda message: check_dm_channel(
+                                                message, member),
+                                            timeout=180)
+        except asyncio.exceptions.TimeoutError:
+            await ctx.send("Bon ça fait 3 minutes que j'attends...\nJe laisse tomber")
+            return
         for dm in all_dm:
             await dm.delete()
 
@@ -41,7 +50,7 @@ class Leekwars(commands.Cog):
                             data={"login": login.content, "password": password.content})
         response = req.json()
         if 'error' in response.keys():
-            await member.dm_channel.send("Identifiants invalides.\nErreur : {response}")
+            await member.dm_channel.send(f"Identifiants invalides.\nErreur : {response}")
         else:
             self.connected_users[member.id] = response
             await member.dm_channel.send("Vous êtes désormais connecté !")
@@ -53,7 +62,12 @@ class Leekwars(commands.Cog):
     @commands.command(name='fight', help='Start LeekWars fights.')
     async def fight(self, ctx, leek=None, count=None):
         member = ctx.message.author
+        channel = get_leekwars_channel(ctx)
+        if channel != ctx.channel:
+            await ctx.message.delete()
+            await channel.send(f"<@!{member.id}>")
         if member.id not in self.connected_users.keys():
+            await channel.send("Il faut d'abord se connecter avec la commande `login`")
             return
 
         token = self.connected_users[member.id]['token']
@@ -67,10 +81,14 @@ class Leekwars(commands.Cog):
 
         if leek is None:
             await ctx.send(f"Choisissez votre poireau :\n{choices}")
-            msg_leek = await self.bot.wait_for('message',
-                                               check=lambda message: check_good_channel(
-                                                   message, ctx),
-                                               timeout=120)
+            try:
+                msg_leek = await self.bot.wait_for('message',
+                                                check=lambda message: check_good_channel(
+                                                    message, ctx),
+                                                timeout=180)
+            except asyncio.exceptions.TimeoutError:
+                await ctx.send("Bon ça fait 3 minutes que j'attends...\nJe laisse tomber")
+                return
             leek = msg_leek.content
         if leek.lower() not in map(str.lower, leek_names):
             await ctx.send(f"Le choix '{leek}' n'est pas valide. Recommencez")
@@ -80,10 +98,14 @@ class Leekwars(commands.Cog):
             ) if val['name'].lower() == leek.lower()][0]
         if count is None:
             await ctx.send(f"Combien ? (max: {fights})")
-            msg_count = await self.bot.wait_for('message',
-                                                check=lambda message: check_good_channel(
-                                                    message, ctx),
-                                                timeout=120)
+            try:
+                msg_count = await self.bot.wait_for('message',
+                                                    check=lambda message: check_good_channel(
+                                                        message, ctx),
+                                                    timeout=180)
+            except asyncio.exceptions.TimeoutError:
+                await ctx.send("Bon ça fait 3 minutes que j'attends...\nJe laisse tomber")
+                return
             count = int(msg_count.content)
         if count not in range(fights+1):
             await ctx.send(f"Le choix '{count}' n'est pas valide. Recommencez")
@@ -93,10 +115,11 @@ class Leekwars(commands.Cog):
         s = 's' if count > 1 else ''
         await ctx.send(f"Combat{s} terminé{s} !")
         await self.fight_results(ctx, fight_results)
+    # endregion
 
+    # region methods
     async def fight_results(self, ctx, results):
         member = ctx.message.author
-        farmer_id = self.connected_users[member.id]['farmer']['id']
         wins = results['win']
         looses = results['loose']
         ties = results['tie']
@@ -117,6 +140,7 @@ class Leekwars(commands.Cog):
             icon_url=member.avatar_url)
         embed.set_thumbnail(url="http://leekwarswiki.net/images/7/70/Poireaux.png")
         await ctx.send(embed=embed)
+    # endregion
 
 
 def get_headers(token):
@@ -187,3 +211,10 @@ def check_dm_channel(message, member):
 
 def check_good_channel(message, ctx):
     return message.author == ctx.message.author and message.channel == ctx.channel
+
+
+def get_leekwars_channel(ctx):
+    for channel in ctx.guild.channels:
+        if channel.name == 'leekwars':
+            return channel
+    return ctx.channel
