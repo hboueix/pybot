@@ -1,4 +1,6 @@
 import datetime
+import asyncio
+import sys
 
 import discord
 from discord.ext import commands
@@ -68,6 +70,20 @@ class Admin(commands.Cog):
                     f'{entry.user} did {entry.action} to {entry.target}\n')
         self.save_commands_logs(self.bot, ctx)
         await ctx.send("Sauvegarde terminée !")
+
+    # @commands.command(name='reset', help='Restart bot (logout then login).')
+    # async def reset(self, ctx, timer=0):
+    #     await ctx.message.delete()
+    #     await asyncio.sleep(timer)
+    #     await self.bot.logout()
+    #     await self.bot.run(Config['DISCORD_TOKEN'])
+
+    @commands.command(name='exit', help='Shutdown bot.')
+    async def exit(self, ctx, timer=0):
+        await ctx.message.delete()
+        await asyncio.sleep(timer)
+        await self.bot.logout()
+        sys.exit()
     # endregion
 
     # region methods
